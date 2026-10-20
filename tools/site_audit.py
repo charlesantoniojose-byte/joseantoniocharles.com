@@ -35,6 +35,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 DOMAIN = "joseantoniocharles.com"
 GITHUB_HOST = "charlesantoniojose-byte.github.io"
+REPO = "charlesantoniojose-byte/joseantoniocharles.com"
 GITHUB_PAGES_IPS = {"185.199.108.153", "185.199.109.153", "185.199.110.153", "185.199.111.153"}
 RESUME_PDF = ROOT / "assets/docs/Jose_Antonio_Charles_Resume.pdf"
 MASTER_RESUME = Path.home() / ("Library/CloudStorage/OneDrive-Personal/Personal Projects/"
@@ -324,6 +325,28 @@ def check_live_site():
         record("ALERT", "Live site", f"http://{DOMAIN}/ unreachable ({type(e).__name__})")
 
 
+def check_github_settings():
+    """Pages only works from a public repo on a free account; going private silently unpublishes the site."""
+    gh = Path.home() / ".local/bin/gh"
+    if not gh.is_file():
+        return
+    code, out = run([str(gh), "api", f"repos/{REPO}", "--jq", ".visibility"])
+    if code != 0:
+        record("WARN", "GitHub settings", "could not read repo settings (is gh signed in?)")
+        return
+    if out.strip() != "public":
+        record("ALERT", "GitHub settings",
+               f"repo is {out.strip()}; GitHub Pages is off on a free account. Make it public again in repo Settings")
+        return
+    code, out = run([str(gh), "api", f"repos/{REPO}/pages", "--jq", '.cname + " " + (.https_enforced|tostring)'])
+    if code != 0:
+        record("ALERT", "GitHub settings", "GitHub Pages is not enabled for the repo (Settings > Pages)")
+    elif out.strip() != f"{DOMAIN} true":
+        record("WARN", "GitHub settings", f"Pages custom domain / HTTPS setting is '{out.strip()}', expected '{DOMAIN} true'")
+    else:
+        record("PASS", "GitHub settings", "repo public, Pages on, custom domain and HTTPS enforced")
+
+
 def check_deploy_matches_github(wait_seconds=0):
     """The live index.html should match index.html on GitHub's main branch.
 
@@ -448,6 +471,7 @@ def main():
     if not args.offline:
         check_external_links(pages)
         check_live_site()
+        check_github_settings()
 
     blocked = any(r[0] == "FAIL" for r in results)
     if args.publish and not blocked:
