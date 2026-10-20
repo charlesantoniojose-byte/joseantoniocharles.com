@@ -45,17 +45,3 @@ chips.forEach((chip) => {
     });
   });
 });
-
-// Contact form: static hosting has no backend, so compose an email in the visitor's mail app
-const form = document.getElementById('contactForm');
-form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  if (!form.reportValidity()) return;
-  const data = new FormData(form);
-  const name = data.get('name').trim();
-  const company = data.get('company').trim();
-  const subject = `Portfolio inquiry from ${name}${company ? ' (' + company + ')' : ''}`;
-  const body = `${data.get('message').trim()}\n\n${name}\n${data.get('email').trim()}${company ? '\n' + company : ''}`;
-  window.location.href = `mailto:Jose.Antonio.Charles@outlook.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  document.getElementById('formNote').textContent = 'Your email app should open with the message ready to send. If it does not, email Jose.Antonio.Charles@outlook.com directly.';
-});
