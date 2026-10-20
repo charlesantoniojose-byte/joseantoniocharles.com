@@ -1,0 +1,7 @@
+# GitHub Pages build settings. Plain HTML files without front matter are copied as-is.
+# Keep internal tooling and notes off the public site.
+exclude:
+  - tools/
+  - README.md
+include:
+  - CNAME
