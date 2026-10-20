@@ -44,3 +44,19 @@ to the Formspree URL, then remove the submit handler at the bottom of `js/script
 - In the repo, Settings > Pages: source `main` / `(root)`, custom domain `joseantoniocharles.com`, then tick
   **Enforce HTTPS** once the certificate is issued.
 - To publish changes: commit and `git push`. The site updates in about a minute.
+
+## Monthly audit and publishing
+
+Edit files in this folder; GitHub is updated automatically once a month.
+
+- **Schedule:** the 1st of every month at 10:00 (user crontab, tagged `# portfolio-site-audit`).
+- **Script:** `tools/site_audit.py --publish` audits the folder and the live site, then commits and
+  pushes to GitHub if nothing blocking was found. Not published to the site (excluded in `_config.yml`).
+- **Report:** `.audit/latest.md` (plus one dated file per run; `.audit/cron.log` has raw output).
+  A macOS notification says whether the run passed.
+- **Levels:** FAIL blocks publishing (broken HTML or links, em dashes, secrets, transcript or key
+  files, files over 25 MB, wrong CNAME). ALERT means the live site or a push needs attention
+  (DNS, certificate, deploy mismatch, sign-in). WARN is worth a look (resume PDF older than the
+  master resume, dead external links, missing alt text).
+- **Run it now:** `python3 tools/site_audit.py` (audit only) or `python3 tools/site_audit.py --publish`.
+- **Pushing needs a GitHub sign-in once:** `~/.local/bin/gh auth login` then `~/.local/bin/gh auth setup-git`.
