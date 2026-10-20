@@ -35,12 +35,12 @@ to the Formspree URL, then remove the submit handler at the bottom of `js/script
 
 ## Hosting: GitHub Pages at joseantoniocharles.com
 
-- Repo: `github.com/Jose-Charles-Chemical-Engineer/joseantoniocharles.com` (public, branch `main`)
+- Repo: `github.com/charlesantoniojose-byte/joseantoniocharles.com` (public, branch `main`)
 - `CNAME` tells GitHub Pages to serve the site at `joseantoniocharles.com`; `.nojekyll` skips Jekyll processing.
 - DNS at the registrar:
   - `A` records for `@`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
   - `AAAA` records for `@`: `2606:50c0:8000::153`, `2606:50c0:8001::153`, `2606:50c0:8002::153`, `2606:50c0:8003::153`
-  - `CNAME` record for `www`: `jose-charles-chemical-engineer.github.io`
+  - `CNAME` record for `www`: `charlesantoniojose-byte.github.io`
 - In the repo, Settings > Pages: source `main` / `(root)`, custom domain `joseantoniocharles.com`, then tick
   **Enforce HTTPS** once the certificate is issued.
 - To publish changes: commit and `git push`. The site updates in about a minute.
