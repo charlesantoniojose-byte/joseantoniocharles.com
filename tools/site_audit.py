@@ -181,6 +181,7 @@ def check_local_links(pages):
             if re.match(r"^(https?:|mailto:|tel:|data:|javascript:|//)", ref):
                 continue
             path, _, frag = ref.partition("#")
+            path = path.split("?", 1)[0]
             target = (p.parent / urllib.parse.unquote(path)).resolve() if path else p
             if target.is_dir():
                 target = target / "index.html"
@@ -382,6 +383,24 @@ def check_deploy_matches_github(wait_seconds=0):
 
 # ------------------------------------------------------------------ publishing
 
+def stamp_asset_versions():
+    """Tag CSS/JS links with a content hash (style.css?v=abc123) so browsers fetch new versions
+    immediately instead of reusing a cached copy for up to 10 minutes."""
+    for page in (p for p in site_files() if p.suffix == ".html"):
+        text = page.read_text(encoding="utf-8")
+
+        def stamp(match):
+            asset = (page.parent / match.group(2)).resolve()
+            if not asset.is_file():
+                return match.group(0)
+            digest = hashlib.sha256(asset.read_bytes()).hexdigest()[:10]
+            return f'{match.group(1)}{match.group(2)}?v={digest}"'
+
+        new_text = re.sub(r'((?:href|src)=")([^"?#]+\.(?:css|js))(?:\?v=[0-9a-f]+)?"', stamp, text)
+        if new_text != text:
+            page.write_text(new_text, encoding="utf-8")
+
+
 def publish():
     git = "/usr/bin/git"
     code, status = run([git, "status", "--porcelain"])
@@ -475,6 +494,7 @@ def main():
 
     blocked = any(r[0] == "FAIL" for r in results)
     if args.publish and not blocked:
+        stamp_asset_versions()
         publish()
     if not args.offline:
         check_deploy_matches_github(wait_seconds=300 if pushed else 0)
