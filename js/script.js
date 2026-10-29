@@ -45,3 +45,11 @@ chips.forEach((chip) => {
     });
   });
 });
+
+// Back-to-top button: show it once the visitor scrolls past the hero
+const toTop = document.getElementById('toTop');
+if (toTop) {
+  const onScroll = () => toTop.classList.toggle('is-visible', window.scrollY > 600);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+}
