@@ -262,7 +262,9 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def check_external_links(pages):
     urls = sorted({ref for pr in pages.values() for tag, ref in pr.refs
-                   if ref.startswith("http") and tag == "a" and DOMAIN not in ref})
+                   if ref.startswith("http") and tag == "a" and DOMAIN not in ref
+                   # Amazon blocks bots, and automated hits on affiliate links should be avoided
+                   and "amazon.com/" not in ref})
     bad = []
     for url in urls:
         try:
